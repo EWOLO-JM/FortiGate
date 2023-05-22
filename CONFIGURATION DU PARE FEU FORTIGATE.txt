@@ -1,6 +1,94 @@
 CONFIGURATION DU PARE FEU FORTIGATE
 
 
+Installation et configuration de FortIgate 80 F
+
+
+Etape 1 : Connexion par port console / Reseau RJ45
+
+- Connexion a la machine
+- Divice mange > Port > Port serie> Port COM3 USB Serial Port>Baud rate 9600> CONNECT
+-Allumer le FortiGate
+-Authentification: (admin, sans mdp)
+- Connexion par cable Rx @ip: 192.168.1.99(tous les ports LAN)
+Tester par le ping
+ping 8.8.8.8 -tt
+-Connecter ma carte Ethernet en statique dans le meme sous reseau
+-Se connecter par interface WEB
+- Changer le MDP
+
+Etape 2: Configuration de base
+
+- Hostname : FG-NomEntreprise
+- Dashbord Type : comprehessif
+- Mettre a jour le Firmeware
+
+Etape 3 : WAN1 /
+
+New interface>
+Name:WAN
+Alias:
+Type:wan1
+VLAN ID:201
+Role: WAN
+
+Addresse> Cas du PPPoE(Username:xxxxxx | Password: xxxxxx | Unnumbered IP: xxxx)
+
+Administrative Access> IPv4: Cocher le PING uniquement OK
+Connecter le cable au port qu'on vient de configurer puis on Refresh la page elle s'active au VERT.
+
+
+
+Etape 4 : LAN(LAN-CP, VLANS....)
+Cliquer sur Interface Internal puis delier les interfaces : Internal1.2.3.4.5.6 puis cliquer sur OKAY
+
+new interface -> Interface Members:Name (Main) type(802.3ad Aggregate), Interface Members(internal1, internal2, internal3)
+Adress ->  Manual ->IP/Netmask :10.35.0.1/255.255.255.0
+Administrative access : Activer le PING, Speed Test, GUI, HTTP, HTTPS et SSH.
+Si le serveur DHCP est actif ailleurs pas besoin le l'activer ici.
+
+
+new interface -> :Name (Trappist) type(802.3ad Aggregate),  Interface Members: internal4, internal5
+Adress ->  Manual ->IP/Netmask :10.0.0.1/255.255.255.0
+Administrative access : Activer le PING, Speed Test, GUI, HTTP, HTTPS et SSH.
+Ici on a besoin du serveur DHCP->Enable->address range[10.0.0.11-10.0.0.249] On peut spécifier le DNS si on veut.
+OKAY
+
+DEFINIR 2 VLANs SUR UN PORT
+VLAN1: new interface -> Interface Members:Name (LAB75) type(VLAN), Interface Members(internal6),VLAN ID:(75), Role : LAN
+Adress ->  Manual ->IP/Netmask :10.75.0.1/255.255.255.0
+Administrative access : Activer le PING, Speed Test, GUI, HTTP, HTTPS et SSH.
+VLAN2: new interface -> Interface Members:Name (IO) type(VLAN), Interface Members(internal6),VLAN ID:(15), Role : LAN
+Adress ->  Manual ->IP/Netmask :10.15.0.1/255.255.255.0
+Administrative access : Activer le PING, Speed Test.
+
+ON PEUT DEJA CONNECTER AU RACK
+Il faut aussi prendre en compte que le SWICHT doit prendre en compte le LSCP
+On va perdre la connexion au niveau de notre RX actuel par contre les RX configurer sont disponible
+
+
+
+
+Etape 5 :  WAN2( Cable)
+
+Etape 6 : SDWAN
+
+Network->SDWAN->On remarque qu'il ya deja 2 interfaces qui ont deja été creer pour nous:
+
+1- le virtual-wan-link
+Ajoutons lui des membres
+1-Create new->SDWAN Member->Inteface(WAN1)->SDWANZone(virtual-wan-link)-Gaterway(Dynamic)->Status(Enable).
+2-Create new->SDWAN Member->Inteface(WAN2)->SDWANZone(virtual-wan-link)-Gaterway(Dynamic)->Status(Enable).
+
+New Performance SLA
+Name(GoogleDNS)->Probe mode(Active)->server(8.8.8.8)->Participants(All SD-WAN Members)->SLA Target(DesActiver)->OK
+
+SD-WAN Rules
+Name(Best Fist)->source adress(all)->Destination adress(all)-ProtocolNumber(ANY)-Outgoing Intrface(Best Quality)-> Interfaces(WAN1 et WAN2)->MesureSLA(googleDNS)->OK
+
+REGLE POUR ALLER SUR INTERNET
+Polycies&Objects->CreateNew->Main to SD-WAN->Interface(MAIN)->Outgoint(virtual-wan-link)->Source adress(Main address)->Destination address(all)->Service(all)->OK
+
 
 
 
