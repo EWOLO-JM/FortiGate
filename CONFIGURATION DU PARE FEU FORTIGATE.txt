@@ -1,0 +1,12 @@
+CONFIGURATION DU PARE FEU FORTIGATE
+
+
+
+
+
+https://www.youtube.com/watch?v=fy114RjX80U
+
+
+https://www.it-connect.fr/creation-dune-regle-de-pare-feu-avec-un-fortigate/
+
+https://all-it-network.com/fortinet-vpn-ssl/
