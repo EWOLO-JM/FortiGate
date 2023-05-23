@@ -21,3 +21,17 @@ show system interface port1
             set snmp-index 6
         next
     end
+
+
+To configure a static route using the CLI:
+config router static
+
+edit 1
+
+set destination <ip address/netmask>
+
+set gateway <ip address>
+
+set distance <value>
+
+end
